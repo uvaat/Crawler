@@ -120,7 +120,7 @@ class Robot
 
 		$this->saveLog($datasFirst['content']);
 
-		//Récupérer de la 2e url (dans le javascript)
+		//Récupérer la 2e url (dans le javascript)
 		$regex = '/http?\:\/\/r.twenga.fr\/g2.php?[^\" ]+/i';
 		preg_match($regex, $datasFirst['content'], $matches);
 

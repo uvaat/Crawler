@@ -50,7 +50,6 @@ class Helpers
 	    $response['errmsg'] = curl_error($curl); 
 	    $response['header'] = curl_getinfo($curl);
 
-	    
 	    curl_close($curl); 
 	 
 	    return $response; 
