@@ -89,11 +89,11 @@ class Robot
 		$words = array('indisponible', 'plus disponible', 'approvisionnement', 'en stock');
 		
 		$nodeText = $crawler->filter('div')->each(function ($node, $i) {
-		    return strip_tags($node->text());
+		    return $node->text();
 		});
 
 		$text = implode($nodeText);
-		$text = strtolower($text);
+		$text = strtolower(strip_tags($text));
 	    foreach ($words as $word) {
 	    	if(stripos($text, $word)) return $word;
 		}
