@@ -14,8 +14,6 @@
 		</div>
 
 		<h2>Les produits</h2>
-		
-		<?php var_dump($products); ?>
 
 		<?php foreach ($products as $product): ?>
 
@@ -24,10 +22,11 @@
 					<h3 class="panel-title"><?php echo $product['title']; ?></h3>
 				</div>
 				<div class="panel-body">
-					Prix : <?php echo $product['price']; ?></li>
-					<pre>
-						<?php var_dump($product['url']); ?>
-					</pre>
+					<ul>
+						<li>Prix : <?php echo $product['price']; ?></li>
+						<li>Url : <?php echo $product['url']; ?></li>
+						<li><?php echo $product['stock']; ?></li>
+					</ul>
 				</div>
 			</div>
 

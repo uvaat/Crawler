@@ -11,8 +11,7 @@ class CrawlerController extends BaseController
     public function get(){
 
 		$robot = new Robot('http://www.twenga.fr/theiere.html');
-        $products = $robot->process();
-
+        $products = $robot->process(1);
         return view('crawler', array('products' => $products));
     	
     }

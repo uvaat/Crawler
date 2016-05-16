@@ -14,6 +14,14 @@ class Robot
 		$this->crawler = new Crawler();
 		$this->target = $target;
 		$this->products = array();
+		$this->logFile = storage_path() . '/logs/robots.log';
+
+	}
+
+	private function saveLog($msg){
+
+		error_log('=> ' . date("Y-m-d H:i:s") . "\n", 3, $this->logFile);
+		error_log($msg."\n", 3, $this->logFile);
 
 	}
 
@@ -69,16 +77,59 @@ class Robot
 	}
 
 	/**
-	 * Récupérer l'url du produit
+	 * Récupérer le stock
+	 * @param  String $content contenue de la page (du vendeur)
+	 * @return String
+	 */
+	private function getStock($content){
+
+		$crawler = new Crawler();
+		$crawler->add($content);
+
+		$words = array('indisponible', 'plus disponible', 'approvisionnement', 'en stock');
+		
+		$nodeText = $crawler->filter('div')->each(function ($node, $i) {
+		    return strip_tags($node->text());
+		});
+
+		$text = implode($nodeText);
+		$text = strtolower($text);
+	    foreach ($words as $word) {
+	    	if(stripos($text, $word)) return $word;
+		}
+
+		return 'Inconnu';
+
+	}
+
+	/**
+	 * Récupérer la page du produit
 	 * @param  Crawler $crawlerProduct
 	 * @return String                 
 	 */
-	private function getUrl($crawlerProduct){
+	private function getInfosSeller($crawlerProduct){
 
+		// Récupérer la premiere url
 		$dataErl = $crawlerProduct->filter('.clr9')->first()->filter('span')->attr('data-erl');
+
+		// Décoder l'url
 		$url = str_rot13($dataErl);
-		
-		return Helpers::get_web_page($url);
+
+		// Récupération de la premiere page de redirection
+		$datasFirst = Helpers::curl($url, true);
+
+		$this->saveLog($datasFirst['content']);
+
+		//Récupérer de la 2e url (dans le javascript)
+		$regex = '/http?\:\/\/r.twenga.fr\/g2.php?[^\" ]+/i';
+		preg_match($regex, $datasFirst['content'], $matches);
+
+		// Récupération des datas de la deuxième page
+		$datasSecond = Helpers::curl($matches[0], false);
+
+		// Envoyer l'url final
+		return $datasSecond;
+
 
 	}
 
@@ -99,9 +150,13 @@ class Robot
 			$product['title'] = $this->getTitle($crawlerProduct);
 			$product['price'] = $this->getPrice($crawlerProduct);
 			
-			$product['url'] = $this->getUrl($crawlerProduct);
+			$infosSeller = $this->getInfosSeller($crawlerProduct);
+			$product['url'] = $infosSeller['header']['url'];
+			$product['stock'] = $this->getStock($infosSeller['content']);
 
 			$this->saveProduct($product);
+
+			sleep(5);
 			
 		});
 

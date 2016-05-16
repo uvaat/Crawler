@@ -11,6 +11,8 @@
 |
 */
 
+ini_set('max_execution_time', 0);
+
 $app = require __DIR__.'/../bootstrap/app.php';
 
 /*
